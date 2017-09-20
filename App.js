@@ -10,10 +10,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Button
+
 } from 'react-native'
 import { BarCodeScanner, Permissions } from 'expo'
 import axios from 'axios'
+import { Container, Header, Content, Form, Item, Input, Label, Button, Body, Tab, Tabs, Card } from 'native-base';
+// import Tab1 from './tabOne';
+// import Tab2 from './tabTwo';
+
+const API_URL = 'http://192.168.1.5:4000'
 
 export default class App extends Component {
   state = {
@@ -43,7 +48,7 @@ export default class App extends Component {
 
       // Parse data
       const token = JSON.parse(result.data)
-      axios.post('http://172.25.136.135:3000/api/otp/verify', {
+      axios.post(API_URL + '/api/otp/verify', {
         otp: token,
         username: this.state.username
       }).then(function (response) {
@@ -57,7 +62,10 @@ export default class App extends Component {
 
   _handleButtonPress = async () => {
     try {
-      const res = await axios.post('http://172.25.136.135:3000/api/login', {
+      console.log('username: ', this.state.username)
+      console.log('password: ', this.state.password)
+
+      const res = await axios.post(API_URL + '/api/login', {
         username: this.state.username,
         password: this.state.password
       })
@@ -81,50 +89,63 @@ export default class App extends Component {
 
   render() {
     if (!this.state.token) {
-      return (<View>
-        <TextInput
-          onChangeText={username => this.setState({ username })}
-          style={{
-            width: 200, height: 44, padding: 8, borderColor: 'gray', borderWidth: 1, marginTop: 80, marginLeft: 50
-          }}
-        />
-        <TextInput
-          value={this.state.inputValue}
-          onChangeText={password => this.setState({ password })}
-          style={{
-            width: 200, height: 44, padding: 8, borderColor: 'gray', borderWidth: 3, marginTop: 4, marginLeft: 50
-          }}
-        />
-        <Button
-          title="Log in"
-          onPress={() => this._handleButtonPress()}
-        />
-      </View>
+      return (
+        <Container>
+          <Header />
+
+          <Content>
+            <Form>
+              <Item floatingLabel >
+                <Label>Username</Label>
+                <Input onChangeText={username => this.setState({ username })} />
+              </Item>
+              <Item floatingLabel last secureTextEntry >
+                <Label>Password</Label>
+                <Input onChangeText={password => this.setState({ password })} />
+              </Item>
+            </Form>
+            <Button full style={{ margin: 20 }} onPress={() => this._handleButtonPress()}><Text> ورود </Text></Button>
+          </Content>
+
+        </Container>
       )
     }
 
+
     return (
       <View style={styles.container}>
-
-        {this.state.hasCameraPermission === null
-          ? <Text>Requesting for camera permission</Text>
-          : this.state.hasCameraPermission === false
-            ? <Text style={{ color: '#fff' }}>
-              Camera permission is not granted
+        <Container>
+          <Header hasTabs />
+          <Tabs initialPage={1}>
+            <Tab heading="Tab1">
+              <Content>
+                <Card>
+                  {this.state.hasCameraPermission === null
+                    ? <Text>Requesting for camera permission</Text>
+                    : this.state.hasCameraPermission === false
+                      ? <Text style={{ color: '#fff' }}>
+                        Camera permission is not granted
                 </Text>
-            : <BarCodeScanner
-              onBarCodeRead={result => this._handleBarCodeRead(result)}
-              style={{
-                height: Dimensions.get('window').height,
-                width: Dimensions.get('window').width,
-              }}
-            />}
+                      : <BarCodeScanner
+                        onBarCodeRead={result => this._handleBarCodeRead(result)}
+                        style={{
+                          height: Dimensions.get('window').height,
+                          width: Dimensions.get('window').width,
+                        }}
+                      />}
 
-        {this._maybeRenderUrl()}
+                  {this._maybeRenderUrl()}
 
-        <StatusBar hidden />
+                  <StatusBar hidden />
+                </Card>
+              </Content>
+            </Tab>
+            <Tab heading="Tab2">
+            </Tab>
+          </Tabs>
+        </Container>
       </View>
-    );
+    )
   }
 
   _handlePressUrl = () => {
