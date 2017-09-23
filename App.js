@@ -16,7 +16,7 @@ import { BarCodeScanner, Permissions } from 'expo'
 import axios from 'axios'
 import { Container, Header, Content, Form, Item, Input, Label, Button, Body, Tab, Tabs, Card, List, ListItem } from 'native-base';
 
-const API_URL = 'http://192.168.1.5:4000'
+const API_URL = 'http://172.23.161.17:4000'
 
 export default class App extends Component {
   state = {
@@ -41,22 +41,31 @@ export default class App extends Component {
     });
   };
 
-  _handleBarCodeRead = result => {
+  _handleBarCodeRead = async result => {
     if (result.data !== this.state.lastScannedUrl) {
       LayoutAnimation.spring();
       this.setState({ lastScannedUrl: result.data });
 
       // Parse data
       const token = JSON.parse(result.data)
-      axios.post(API_URL + '/api/otp/verify', {
-        otp: token,
-        username: this.state.username
-      }).then(function (response) {
-        console.log(response);
-      })
-        .catch(function (error) {
-          console.log(error);
+      let error = null
+      try {
+        const response = await axios.post(API_URL + '/api/otp/verify', {
+          otp: token,
+          username: this.state.username
         })
+        if (response.data.error) {
+          error = response.data.error
+        }
+      } catch (e) {
+        error = e + ''
+      }
+
+      if (error) {
+        Alert.alert('Error!', error)
+      } else {
+        Alert.alert('Checked in successfully')
+      }
     }
   };
 
