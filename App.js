@@ -10,13 +10,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-
 } from 'react-native'
-import { BarCodeScanner, Permissions } from 'expo'
+import { BarCodeScanner, Permissions, Constants } from 'expo'
 import axios from 'axios'
 import { Container, Header, Content, Form, Item, Input, Label, Button, Body, Tab, Tabs, Card, List, ListItem } from 'native-base';
 
-const API_URL = 'http://172.23.161.17:4000'
+const API_URL = 'http://172.25.136.113:4000'
+
+axios.defaults.withCredentials = 'include'
 
 export default class App extends Component {
   state = {
@@ -46,21 +47,26 @@ export default class App extends Component {
       LayoutAnimation.spring();
       this.setState({ lastScannedUrl: result.data });
 
+      // Get deviceID
+      // deviceID = Constants.deviceID
+      // console.log('deviceID', deviceID)
+      // console.log('hoooo3')
+      devID = '123456'
       // Parse data
       const token = JSON.parse(result.data)
       let error = null
       try {
         const response = await axios.post(API_URL + '/api/otp/verify', {
           otp: token,
-          username: this.state.username
+          devID: devID
         })
+        console.log(response)
         if (response.data.error) {
           error = response.data.error
         }
       } catch (e) {
         error = e + ''
       }
-
       if (error) {
         Alert.alert('Error!', error)
       } else {
@@ -81,8 +87,6 @@ export default class App extends Component {
         .split(';')
         .map(s => s.split('='))
         .find(p => p[0] == 'connect.sid')[1]
-
-      axios.defaults.headers.common['Cookie'] = 'connect.sid=' + token
       this.setState({ token })
 
       this.setState({ first_name: res.data.first_name })
