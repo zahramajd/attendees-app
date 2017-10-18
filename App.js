@@ -15,7 +15,7 @@ import { BarCodeScanner, Permissions, Constants } from 'expo'
 import axios from 'axios'
 import { Container, Header, Content, Form, Item, Input, Label, Button, Body, Tab, Tabs, Card, List, ListItem } from 'native-base';
 
-const API_URL = 'http://172.25.136.113:4000'
+const API_URL = 'http://192.168.1.2:4000'
 
 axios.defaults.withCredentials = 'include'
 
@@ -28,7 +28,8 @@ export default class App extends Component {
     password: null,
     token: null,
     first_name: null,
-    last_name: null
+    last_name: null,
+    sessions: []
   };
 
   componentDidMount() {
@@ -49,8 +50,6 @@ export default class App extends Component {
 
       // Get deviceID
       // deviceID = Constants.deviceID
-      // console.log('deviceID', deviceID)
-      // console.log('hoooo3')
       devID = '123456'
       // Parse data
       const token = JSON.parse(result.data)
@@ -92,6 +91,12 @@ export default class App extends Component {
       this.setState({ first_name: res.data.first_name })
       this.setState({ last_name: res.data.last_name })
 
+      const res_sessions = await axios.get(API_URL + '/api/user/session-of', {
+        username: this.state.username,
+      })
+
+      this.setState({ sessions: res_sessions.data.sessions })
+      console.log(this.state.sessions)
     }
     catch (err) {
       console.log(err)
@@ -157,9 +162,6 @@ export default class App extends Component {
           </Tab>
           <Tab heading="Profile">
             <List>
-              <ListItem itemDivider>
-                <Text>profile info</Text>
-              </ListItem>
               <ListItem >
                 <Text>first name: {this.state.first_name}</Text>
               </ListItem>
@@ -169,6 +171,15 @@ export default class App extends Component {
               <ListItem>
                 <Text>username: {this.state.username}</Text>
               </ListItem>
+            </List>
+          </Tab>
+          <Tab heading="Courses">
+            <List dataArray={this.state.sessions}
+              renderRow={(item) =>
+                <ListItem>
+                  <Text>{item.name}</Text>
+                </ListItem>
+              }>
             </List>
           </Tab>
         </Tabs>
