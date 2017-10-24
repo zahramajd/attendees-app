@@ -15,7 +15,7 @@ import { BarCodeScanner, Permissions, Constants } from 'expo'
 import axios from 'axios'
 import { Container, Header, Content, Form, Item, Input, Label, Button, Body, Tab, Tabs, Card, List, ListItem } from 'native-base';
 
-const API_URL = 'http://192.168.1.2:4000'
+const API_URL = 'http://172.23.161.17:4000'
 
 axios.defaults.withCredentials = 'include'
 
@@ -112,7 +112,6 @@ export default class App extends Component {
       return (
         <Container>
           <Header />
-
           <Content>
             <Form>
               <Item floatingLabel >
@@ -126,7 +125,6 @@ export default class App extends Component {
             </Form>
             <Button full style={{ margin: 20 }} onPress={() => this._handleButtonPress()}><Text> Log in </Text></Button>
           </Content>
-
         </Container>
       )
     }
@@ -154,7 +152,7 @@ export default class App extends Component {
                       }}
                     />}
 
-                {this._maybeRenderUrl()}
+                {/* {this._maybeRenderUrl()} */}
 
                 <StatusBar hidden />
               </Card>
@@ -206,28 +204,28 @@ export default class App extends Component {
     this.setState({ lastScannedUrl: null });
   };
 
-  _maybeRenderUrl = () => {
-    if (!this.state.lastScannedUrl) {
-      return;
-    }
+  // _maybeRenderUrl = () => {
+  //   if (!this.state.lastScannedUrl) {
+  //     return;
+  //   }
 
-    return (
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.url} onPress={this._handlePressUrl}>
-          <Text numberOfLines={1} style={styles.urlText}>
-            {this.state.lastScannedUrl}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={this._handlePressCancel}>
-          <Text style={styles.cancelButtonText}>
-            Cancel
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  //   return (
+  //     <View style={styles.bottomBar}>
+  //       <TouchableOpacity style={styles.url} onPress={this._handlePressUrl}>
+  //         <Text numberOfLines={1} style={styles.urlText}>
+  //           {this.state.lastScannedUrl}
+  //         </Text>
+  //       </TouchableOpacity>
+  //       <TouchableOpacity
+  //         style={styles.cancelButton}
+  //         onPress={this._handlePressCancel}>
+  //         <Text style={styles.cancelButtonText}>
+  //           Cancel
+  //         </Text>
+  //       </TouchableOpacity>
+  //     </View>
+  //   );
+  // };
 }
 
 const styles = StyleSheet.create({
